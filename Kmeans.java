@@ -1,77 +1,67 @@
 import java.util.ArrayList;
-public class Kmeans{
+
+public class Kmeans {
     Point[] points;
     Point[] centroids;
 
-    public Kmeans(Point[] points, Point[] centroids){
+    public Kmeans(Point[] points, Point[] centroids) {
         this.points = points;
         this.centroids = centroids;
         runKmeans();
     }
 
-    public void runKmeans(){
-        Point[] oldCentroids = new Point[centroids.length];
-        boolean centroidsChanged;
+    public void runKmeans() {
+        boolean centroidChanged;
         do {
-            // Sauvegarder les centroïdes actuels
-            for (int i = 0; i < centroids.length; i++) {
-                oldCentroids[i] = new Point(centroids[i].getX(), centroids[i].getY(), centroids[i].getName());
-            }
-
+            centroidChanged = false;
             ArrayList<ArrayList<Point>> listePoints = new ArrayList<>();
+
             for (int i = 0; i < centroids.length; i++) {
                 listePoints.add(new ArrayList<>());
             }
 
             for (Point point : points) {
-                if (!point.isCentroid(centroids)) {
-                    int closestCentroidIndex = -1;
-                    double minDistance = Double.MAX_VALUE;
-                    for (int i = 0; i < centroids.length; i++) {
-                        double distance = point.distance(centroids[i]);
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            closestCentroidIndex = i;
-                        }
+                int closestCentroidIndex = -1;
+                double minDistance = Double.MAX_VALUE;
+                for (int i = 0; i < centroids.length; i++) {
+                    double distance = point.distance(centroids[i]);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestCentroidIndex = i;
                     }
-                    if (closestCentroidIndex != -1) {
-                        listePoints.get(closestCentroidIndex).add(point);
-                    }
+                }
+                listePoints.get(closestCentroidIndex).add(point);
+            }
+
+            Point[] oldCentroids = new Point[centroids.length];
+            for (int i = 0; i < centroids.length; i++) {
+                oldCentroids[i] = new Point(centroids[i].getX(), centroids[i].getY(), centroids[i].getName());
+            }
+
+            for (int i = 0; i < centroids.length; i++) {
+                centroids[i] = moyenneCentroids(listePoints.get(i));
+                if (!oldCentroids[i].equals(centroids[i])) {
+                    centroidChanged = true;
                 }
             }
 
             for (int i = 0; i < listePoints.size(); i++) {
-                System.out.println(listePoints.get(i));
+                System.out.println("Cluster " + (i + 1) + ": " + listePoints.get(i));
             }
             System.out.println("----------------------------------");
 
-            centroidsChanged = false; // Réinitialiser le drapeau de changement
-            for (int i = 0; i < centroids.length; i++) {
-                Point newCentroid = moyenneCentroids(listePoints.get(i));
-                if (!newCentroid.equals(centroids[i])) {
-                    centroidsChanged = true; // Les centroïdes ont changé
-                }
-                centroids[i] = newCentroid;
-                //System.out.println(centroids[i]);
-            }
-
-        } while (centroidsChanged); // Continuer tant que les centroïdes changent
+        } while (centroidChanged);
     }
 
-    public Point moyenneCentroids(ArrayList<Point> listePoints){
-        if (listePoints.isEmpty()) {
-            // Si la liste est vide, retourner un centroïde par défaut ou conserver l'ancien centroïde
-            return new Point(0, 0, ""); // Ou vous pouvez retourner un centroïde existant
+    public Point moyenneCentroids(ArrayList<Point> listePoints) {
+        int sommeX = 0;
+        int sommeY = 0;
+        for (Point point : listePoints) {
+            sommeX += point.getX();
+            sommeY += point.getY();
         }
-
-        int moyenneX = 0;
-        int moyenneY = 0;
-        for(int j = 0; j < listePoints.size(); j++){
-            moyenneX += listePoints.get(j).getX();
-            moyenneY += listePoints.get(j).getY();
-        }
-        moyenneX /= listePoints.size();
-        moyenneY /= listePoints.size();
+        int moyenneX = sommeX / listePoints.size();
+        int moyenneY = sommeY / listePoints.size();
         return new Point(moyenneX, moyenneY, "");
     }
 }

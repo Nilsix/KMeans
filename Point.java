@@ -1,43 +1,37 @@
-public class Point{
+public class Point {
     private int x, y;
     private String name;
-    
-    Point(){
+
+    public Point() {
         this.x = 0;
         this.y = 0;
         this.name = "";
     }
 
-    Point(int x, int y, String name){
+    public Point(int x, int y, String name) {
         this.x = x;
         this.y = y;
         this.name = name;
     }
 
-    public void copyPoint(Point p){
-        this.x = p.getX();
-        this.y = p.getY();
-        this.name = p.getName();
+    public int getX() {
+        return x;
     }
 
-    public int getX(){
-        return x;
-    }   
-
-    public int getY(){
+    public int getY() {
         return y;
     }
 
-    public double distance(Point p2){
+    public double distance(Point p2) {
         return Math.sqrt(Math.pow(p2.getX() - this.x, 2) + Math.pow(p2.getY() - this.y, 2));
     }
 
-    public Point distanceProche(Point[] points){
+    public Point distanceProche(Point[] points) {
         double distanceMin = Double.MAX_VALUE;
         Point pointProche = new Point();
         for (Point point : points) {
             double distance = distance(point);
-            if(distance < distanceMin){
+            if (distance < distanceMin) {
                 distanceMin = distance;
                 pointProche.copyPoint(point);
             }
@@ -45,29 +39,38 @@ public class Point{
         return pointProche;
     }
 
-    public String getName(){
+    public void copyPoint(Point p) {
+        this.x = p.getX();
+        this.y = p.getY();
+        this.name = p.getName();
+    }
+
+    public String getName() {
         return name;
     }
 
-    public boolean isCentroid(Point[] centroids){
-        for (Point centroid : centroids){
-            if(this.equals(centroid)){
+    public boolean isCentroid(Point[] centroids) {
+        for (Point centroid : centroids) {
+            if (this.equals(centroid)) {
                 return true;
             }
         }
         return false;
     }
 
-
-    public boolean equals(Point p){
-        return this.x == p.getX() && this.y == p.getY() && this.name.equals(p.getName());
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Point point = (Point) obj;
+        return x == point.x && y == point.y;
     }
 
     @Override
-    public String toString(){
-        if(name.equals("")){
-            return name;
+    public String toString() {
+        if (name.equals("")) {
+            return "(" + x + ", " + y + ")";
         }
-        return name+"(" + x + ", " + y + ")";
+        return name + "(" + x + ", " + y + ")";
     }
 }
